@@ -29,67 +29,68 @@ Here is the data pipeline :
 
 >## I am Doing the real time analytics on the live data and also Aggregation operations on the historic data too.
 
-                        $ bin/zookeeper-server-start.sh config/zookeeper.properties
+   ![Data_pipeline](ARC.drawio.png)
 
->Start your `kafka Server` in your Local System.
+>## First Choose the source of your incoming Data .
 
-                        $ bin/kafka-server-start.sh config/server.properties
-
->If you haven't created `topic` the create one
-
-                        $ bin/kafka-topics.sh --create --topic <Topic_name> --bootstrap-server localhost:9092
-
->Open up the `producer` in other terminal or run the producer code  `Api_To_Kafka.py`  or  `Api_To_Kafka_With_Pyspark.py`
-
-                        $ bin/kafka-console-producer.sh --broker-list localhost:9092 --topic <Topic_name>
-
->Now run the `Consumer Ap`p which will consume the data from that Topic or run the consumer code  `Kafka_To_Parquet.py` and `Parquet_To_MongoDB.py`
-
-                        $ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic <Topic_name> --from-beginning
+  ### 1) LogGeneraterToConsole.py
+> This above file will generate the log by it self and showes the data on the console (It is a fake data !)
+       
+  ### 3) S10.py
+> This above file is used to fetch the data from the s3 in aws where i have stored the real web server logs of a website this
+       Dataset (3.6 GB) is available in kaggle.
+       
+  ### 4) logGenerater.py
+> This above file will generate the `fake log data` and pushes that data into the end point !
+       
+  ### 6) LambdaFunctionAWS.py
+> This above file is a lambda function where i am trying to convert the log data in to the json format in real time `This is a real time data
+  Transformations` in AWS
+    
+> NOTE:- The data that I am fetchinng from the dataset is `Semi - Structured Data`  For that reason i am transforming the data and also altering               that date of that data to make it as a real time log data 
  
->In this project, I have used MongoDB Atlas to store and view real-time data. 
->To integrate MongoDB with the locally running Spark job, you need to download the [`Spark-MongoDB Connector.`](https://www.mongodb.com/docs/spark-connector/current/).
->It is a JAR file that you can find in the provided link or on the [`Maven Dependencies`](https://mvnrepository.com/artifact/org.mongodb.spark/mongo-spark-connector) webpage.
-
 
 # Project flow Steps :
 
 ```bash 
-Real-Time-Data-Pipeline-Using-Kafka:.
+Real-Time-Log-Aggregation-And-Analytics:.
 |   README.md
 |
 +---dashboard
-|       weather_api_project.pdf
+|       Log_Aggregation_And_Analysis.pdf
 |       
 |
 +---images
-|       flow.png
+|       Flow_diagram.png
+|       ARC.drawio.png
 |       
 |
 \---Main
-        Api_To_Kafka.py
-                        <`python3 Api_To_Kafka.py`>
-        Kafka_To_Parquet.py
-                        <`spark-submit   --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,
-                          org.mongodb.spark:mongo-spark-connector_2.12:3.0.1   Kafka_To_Parquet.py`>
-        Parquet_To_MongoDB.sh
-                        <`spark-submit   --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,
-                          org.mongodb.spark:mongo-spark-connector_2.12:3.0.1   Parquet_To_MongoDB.sh`>
-
+        S10.py
+                        <`S10.py`>
 |
 \--- Option 
-        Api_To_Kafka_With_Pyspark.py
-                        <`spark-submit   --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0 Parquet_To_MongoDB.sh`>
+        LambdaFunctionAWS.py
+                        <`LambdaFunctionAWS`>
+        LogGeneraterToConsole.py
+                        <`LogGeneraterToConsole.py`>
+        logGenerater.py
+                        <`logGenerater.py`>
         
         
 ```
-# 🦾 Data Structer That I Am Getting From The Api End_Point :
-```json
-{"coord": {"lon": 80.2785, "lat": 13.0878}, "weather": [{"id": 801, "main": "Clouds", "description": "few clouds", "icon": "02n"}], "base": "stations", "main": {"temp": 26.99, "feels_like": 29.18, "temp_min": 26.99, "temp_max": 26.99, "pressure": 1015, "humidity": 74}, "visibility": 6000, "wind": {"speed": 3.09, "deg": 100}, "clouds": {"all": 20}, "dt": 1706190397, "sys": {"type": 1, "id": 9218, "country": "IN", "sunrise": 1706144745, "sunset": 1706186156}, "timezone": 19800, "id": 1264527, "name": "Chennai", "cod": 200}
-{"coord": {"lon": 88.3697, "lat": 22.5697}, "weather": [{"id": 721, "main": "Haze", "description": "haze", "icon": "50n"}], "base": "stations", "main": {"temp": 18.97, "feels_like": 18.8, "temp_min": 18.97, "temp_max": 18.97, "pressure": 1019, "humidity": 72}, "visibility": 2800, "wind": {"speed": 0, "deg": 0}, "clouds": {"all": 8}, "dt": 1706190115, "sys": {"type": 1, "id": 9114, "country": "IN", "sunrise": 1706143671, "sunset": 1706183347}, "timezone": 19800, "id": 1275004, "name": "Kolkata", "cod": 200}
-{"coord": {"lon": 78.4744, "lat": 17.3753}, "weather": [{"id": 721, "main": "Haze", "description": "haze", "icon": "50n"}], "base": "stations", "main": {"temp": 25.23, "feels_like": 25.3, "temp_min": 24.73, "temp_max": 25.23, "pressure": 1018, "humidity": 57}, "visibility": 4000, "wind": {"speed": 3.09, "deg": 70}, "clouds": {"all": 40}, "dt": 1706190301, "sys": {"type": 1, "id": 9214, "country": "IN", "sunrise": 1706145559, "sunset": 1706186209}, "timezone": 19800, "id": 1269843, "name": "Hyderabad", "cod": 200}
-{"coord": {"lon": 77.2167, "lat": 28.6667}, "weather": [{"id": 701, "main": "Mist", "description": "mist", "icon": "50n"}], "base": "stations", "main": {"temp": 13.95, "feels_like": 13.67, "temp_min": 13.95, "temp_max": 14.05, "pressure": 1021, "humidity": 87}, "visibility": 1200, "wind": {"speed": 1.54, "deg": 340}, "clouds": {"all": 20}, "dt": 1706190718, "sys": {"type": 2, "id": 145989, "country": "IN", "sunrise": 1706146968, "sunset": 1706185403}, "timezone": 19800, "id": 1273294, "name": "Delhi", "cod": 200}
-{"coord": {"lon": 77.6033, "lat": 12.9762}, "weather": [{"id": 801, "main": "Clouds", "description": "few clouds", "icon": "02n"}], "base": "stations", "main": {"temp": 26.37, "feels_like": 26.37, "temp_min": 24.9, "temp_max": 26.79, "pressure": 1018, "humidity": 47}, "visibility": 6000, "wind": {"speed": 2.57, "deg": 100}, "clouds": {"all": 20}, "dt": 1706190458, "sys": {"type": 2, "id": 2017753, "country": "IN", "sunrise": 1706145378, "sunset": 1706186808}, "timezone": 19800, "id": 1277333, "name": "Bengaluru", "cod": 200}
+# 🦾 Data Structer That I Am Getting From The log dataset :
+```Log
+54.36.149.41 - - [22/Jan/2019:03:56:14 +0330] "GET /filter/27|13%20%D9%85%DA%AF%D8%A7%D9%BE%DB%8C%DA%A9%D8%B3%D9%84,27|%DA%A9%D9%85%D8%AA%D8%B1%20%D8%A7%D8%B2%205%20%D9%85%DA%AF%D8%A7%D9%BE%DB%8C%DA%A9%D8%B3%D9%84,p53 HTTP/1.1" 200 30577 "-" "Mozilla/5.0 (compatible; AhrefsBot/6.1; +http://ahrefs.com/robot/)" "-"
+31.56.96.51 - - [22/Jan/2019:03:56:16 +0330] "GET /image/60844/productModel/200x200 HTTP/1.1" 200 5667 "https://www.zanbil.ir/m/filter/b113" "Mozilla/5.0 (Linux; Android 6.0; ALE-L21 Build/HuaweiALE-L21) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.158 Mobile Safari/537.36" "-"
+31.56.96.51 - - [22/Jan/2019:03:56:16 +0330] "GET /image/61474/productModel/200x200 HTTP/1.1" 200 5379 "https://www.zanbil.ir/m/filter/b113" "Mozilla/5.0 (Linux; Android 6.0; ALE-L21 Build/HuaweiALE-L21) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.158 Mobile Safari/537.36" "-"
+40.77.167.129 - - [22/Jan/2019:03:56:17 +0330] "GET /image/14925/productModel/100x100 HTTP/1.1" 200 1696 "-" "Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)" "-"
+91.99.72.15 - - [22/Jan/2019:03:56:17 +0330] "GET /product/31893/62100/%D8%B3%D8%B4%D9%88%D8%A7%D8%B1-%D8%AE%D8%A7%D9%86%DA%AF%DB%8C-%D9%BE%D8%B1%D9%86%D8%B3%D9%84%DB%8C-%D9%85%D8%AF%D9%84-PR257AT HTTP/1.1" 200 41483 "-" "Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:16.0)Gecko/16.0 Firefox/16.0" "-"
+40.77.167.129 - - [22/Jan/2019:03:56:17 +0330] "GET /image/23488/productModel/150x150 HTTP/1.1" 200 2654 "-" "Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)" "-"
+40.77.167.129 - - [22/Jan/2019:03:56:18 +0330] "GET /image/45437/productModel/150x150 HTTP/1.1" 200 3688 "-" "Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)" "-"
+40.77.167.129 - - [22/Jan/2019:03:56:18 +0330] "GET /image/576/article/100x100 HTTP/1.1" 200 14776 "-" "Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)" "-"
+66.249.66.194 - - [22/Jan/2019:03:56:18 +0330] "GET /filter/b41,b665,c150%7C%D8%A8%D8%AE%D8%A7%D8%B1%D9%BE%D8%B2,p56 HTTP/1.1" 200 34277 "-" "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)" "-"
+40.77.167.129 - - [22/Jan/2019:03:56:18 +0330] "GET /image/57710/productModel/100x100 HTTP/1.1" 200 1695 "-" "Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)" "-"
 ```
 
 # 🎰 Language Type :
@@ -97,6 +98,6 @@ Real-Time-Data-Pipeline-Using-Kafka:.
 
 
 # 😏 Acknowledgements
- - [Databricks](https://community.cloud.databricks.com/login.html)
- - [Spark](https://spark.apache.org/downloads.html)
- - [MongoDB Atlas](https://www.mongodb.com/atlas/database)
+ - [Kaggle](https://www.kaggle.com/datasets/eliasdabbas/web-server-access-logs)
+ - [AWS](https://aws.amazon.com/free/?gclid=CjwKCAjw_LOwBhBFEiwAmSEQAbO6KI7EbmGUHHVLHBwKcIcjX0rr4Ykn1G7ln0ZSlJIWP2-oSkFk2RoCo7wQAvD_BwE&trk=14a4002d-4936-4343-8211-b5a150ca592b&sc_channel=ps&ef_id=CjwKCAjw_LOwBhBFEiwAmSEQAbO6KI7EbmGUHHVLHBwKcIcjX0rr4Ykn1G7ln0ZSlJIWP2-oSkFk2RoCo7wQAvD_BwE:G:s&s_kwcid=AL!4422!3!453325184782!e!!g!!aws!10712784856!111477279771&all-free-tier.sort-by=item.additionalFields.SortRank&all-free-tier.sort-order=asc&awsf.Free%20Tier%20Types=*all&awsf.Free%20Tier%20Categories=*all)
+
