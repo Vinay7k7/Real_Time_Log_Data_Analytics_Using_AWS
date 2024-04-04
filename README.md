@@ -21,13 +21,13 @@ Here is the data pipeline :
 
 # 🧩 Project Flow :
 
->Install Kafka and Spark !
+>First follow the project flow given in the Document !
 
->Create the account in the OpenWeatherMap Api.
+>Create the account in the AWS.
 
->Watchout for the Dependencies Needed.
+>Try to find the better suited Dataset.
 
->Run your  `ZooKeeper Server` in your Local System.
+>## I am Doing the real time analytics on the live data and also Aggregation operations on the historic data too.
 
                         $ bin/zookeeper-server-start.sh config/zookeeper.properties
 
